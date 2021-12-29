@@ -10,5 +10,15 @@ Final project repo for grad-level Adaptive Signal Processing course at National 
 # Algorithms to be implemented:
 - RLS-DFE (2015)
 - NLMS-DFE (2008 good for time-varying)
-- VSLMS-DFE
 - LMS-DFE
+
+# 分工:
+- 引平：共用code架構+實作LMS-DFE測試。
+- [ ] `test_bench.m`
+- [ ] `main.m`
+- [ ] `shared_utils.m`
+- [ ] `algorithm_LMS_DFE.m`
+- 昊平、宣妤：RLS-DFE
+- [ ] `algorithm_RLS_DFE.m`
+- 若盈：NLMS-DFE
+- [ ] `algorithms_NLMS_DFE.m`
