@@ -3,6 +3,7 @@ rng(seed);
 %{
 Here is for parameter definition for the Static test case.
 %}
+TestCase_Params.Static.NumRepetition = 1;
 TestCase_Params.Static.train_length = 1000;
 TestCase_Params.Static.data_length = 200000;
 TestCase_Params.Static.Algo = 'LMS';
@@ -12,14 +13,16 @@ TestCase_Params.Static.LMS.alpha = 0.01;
 %{
 Here is for parameter definition for the Quasi-Stationary test case.
 %}
+TestCase_Params.Q_Static.NumRepetition = 200;
 TestCase_Params.Q_Static.train_length = 200;
 TestCase_Params.Q_Static.data_length = 1000;
 
 %{
 Here is for parameter definition for the Time-Varying test case
 %}
+TestCase_Params.T_Varying.NumRepetition = 500;
 TestCase_Params.T_Varying.train_length = 50;
-TestCase_Params.T_Varying.data_length = 50;
+TestCase_Params.T_Varying.data_length = 400;
 
 %{
 Here is for test setup configuration.
@@ -44,6 +47,7 @@ function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCa
                 [prior_BER, post_BER, squared_error_seq] = static_test_case(TestCase_Params);
             case 'Q_Static'
                 assert(false, 'Not implemented error.')
+                [prior_BER, post_BER, squared_error_seq] = q_static_test_case(TestCase_Params);
             case 'T_Varying'
                 assert(false, 'Not implemented error.')
             otherwise
@@ -122,5 +126,8 @@ function [prior_BER, post_BER, squared_error_seq] = static_test_case(TestCase_Pa
     utils_inputs.pred_seq = pred_signal;
     utils_inputs.signal_seq = signal(1,TestCase_Params.Static.train_length+1:end);
     post_BER = shared_utils(utils_inputs);
-    utils_inputs.task = [];
+end
+
+function [prior_BER, post_BER, squared_error_seq] = q_static_test_case(TestCase_Params)
+    DataMeasurements = load_measurements();
 end

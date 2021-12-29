@@ -8,6 +8,8 @@ function results = shared_utils(Inputs)
             results = calc_BER(Inputs.pred_seq, Inputs.signal_seq);
         case 'plot_squared_error_curve'
             results = plot_squared_error_curve(Inputs.squared_error_seq, Inputs.title, Inputs.bounds);
+        case 'simple_plot'
+            results = simple_plot(Inputs.seq, Inputs.title);
         otherwise
             assert(false, 'Not implemented error.')
     end
@@ -40,6 +42,16 @@ function none = plot_squared_error_curve(squared_error_seq, plot_title, bounds)
     plot_time_axis = linspace(1,seq_length,seq_length);
     plot(plot_time_axis, moving_average(squared_error_seq, 1));
     ylim(bounds);
+    title(plot_title);
+    none = [];
+end
+
+function none = simple_plot(seq, plot_title)
+    figure(1)
+    seq_size = size(seq);
+    seq_length = seq_size(2);
+    plot_time_axis = linspace(1,seq_length,seq_length);
+    plot(plot_time_axis, moving_average(seq, 1));
     title(plot_title);
     none = [];
 end
