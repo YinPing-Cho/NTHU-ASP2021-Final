@@ -27,6 +27,7 @@ Here is for test setup configuration.
 TestCase_Params.Test = 'Static';
 TestCase_Params.Test_Runs = 10;
 TestCase_Params.SNR = -1;
+TestCase_Params.plot_bounds = [0, 1.6];
 
 %{
 Here is the main execution of the test.
@@ -58,7 +59,7 @@ function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCa
     utils_inputs.squared_error_seq = avg_squared_error_seq;
     utils_inputs.title = sprintf('%s Case avg squared-error over %d runs for %s algo', ...
         TestCase_Params.Test, TestCase_Params.Test_Runs, TestCase_Params.Static.Algo);
-    utils_inputs.bounds = [0, 1.6];
+    utils_inputs.bounds = TestCase_Params.plot_bounds;
     shared_utils(utils_inputs);
     
     fprintf('%s test case; %s; SNR=%.2f;\n',...
