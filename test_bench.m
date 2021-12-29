@@ -1,8 +1,10 @@
+seed = 0;
+rng(seed);
 %{
 Here is for parameter definition for the Static test case.
 %}
 TestCase_Params.Static.train_length = 1000;
-TestCase_Params.Static.data_length = 20000;
+TestCase_Params.Static.data_length = 200000;
 TestCase_Params.Static.Algo = 'LMS';
 TestCase_Params.Static.LMS.L = 20;
 TestCase_Params.Static.LMS.alpha = 0.01;
@@ -31,21 +33,22 @@ Here is the main execution of the test.
 %}
 results = test_main(TestCase_Params);
 
-function results = test_main(TestCase_Params)
-    switch TestCase_Params.Test
-        case 'Static'
-            results = Static_Test_Case(TestCase_Params);
-        otherwise
-            assert(false, 'Not implemented error.')
-    end
-end
-
-function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = Static_Test_Case(TestCase_Params)
+function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCase_Params)
     avg_prior_BER = 0;
     avg_post_BER = 0;
     avg_squared_error_seq = zeros(1,TestCase_Params.Static.train_length);
     for run = 1:TestCase_Params.Test_Runs
-        [prior_BER, post_BER, squared_error_seq] = static_test_case(TestCase_Params);
+        switch TestCase_Params.Test
+            case 'Static'
+                [prior_BER, post_BER, squared_error_seq] = static_test_case(TestCase_Params);
+            case 'Q_Static'
+                assert(false, 'Not implemented error.')
+            case 'T_Varying'
+                assert(false, 'Not implemented error.')
+            otherwise
+                assert(false, 'Not implemented error.')
+        end
+        
         avg_prior_BER = cumulative_avg(avg_prior_BER,prior_BER,run);
         avg_post_BER = cumulative_avg(avg_post_BER,post_BER,run);
         avg_squared_error_seq = cumulative_avg(avg_squared_error_seq,squared_error_seq,run);
@@ -53,8 +56,8 @@ function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = Static_Test_Case
     
     utils_inputs.task = 'plot_squared_error_curve';
     utils_inputs.squared_error_seq = avg_squared_error_seq;
-    utils_inputs.title = sprintf('Static Case avg squared-error over %d runs for %s algo', ...
-        TestCase_Params.Test_Runs, TestCase_Params.Static.Algo);
+    utils_inputs.title = sprintf('%s Case avg squared-error over %d runs for %s algo', ...
+        TestCase_Params.Test, TestCase_Params.Test_Runs, TestCase_Params.Static.Algo);
     utils_inputs.bounds = [0, 1.6];
     shared_utils(utils_inputs);
     
@@ -83,6 +86,7 @@ function [prior_BER, post_BER, squared_error_seq] = static_test_case(TestCase_Pa
     
     noised_signal = signal + noise;
     measured_SNR = snr(signal, noised_signal-signal);
+    assert (abs(measured_SNR-TestCase_Params.SNR) < 1.0)
     %fprintf('Measured SNR: %.2f \n', measured_SNR);
     
     utils_inputs.task = 'calc_BER';
@@ -97,6 +101,18 @@ function [prior_BER, post_BER, squared_error_seq] = static_test_case(TestCase_Pa
         case 'LMS'
             [squared_error_seq, pred_signal] = ...
                 algorithm_LMS(TestCase_Params.Static,known_train_seq,full_noised_signal_seq);
+        case 'LMS-DFE'
+            assert(false, 'Not implemented error.')
+            [squared_error_seq, pred_signal] = ...
+                algorithm_LMS_DFE(TestCase_Params.Static,known_train_seq,full_noised_signal_seq);
+        case 'RLS-DFE'
+            assert(false, 'Not implemented error.')
+            [squared_error_seq, pred_signal] = ...
+                algorithm_RLS_DFE(TestCase_Params.Static,known_train_seq,full_noised_signal_seq);
+        case 'NLMS-DFE'
+            assert(false, 'Not implemented error.')
+            [squared_error_seq, pred_signal] = ...
+                algorithms_NLMS_DFE(TestCase_Params.Static,known_train_seq,full_noised_signal_seq);
         otherwise
         assert(false, 'Not implemented error.')
     end
