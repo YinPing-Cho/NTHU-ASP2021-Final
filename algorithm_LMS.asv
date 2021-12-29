@@ -1,0 +1,26 @@
+function pred_signal = algorithm_LMS(Params, known_train_seq, full_noised_signal_seq)
+    filter_coeffs = LMS_train(Params, known_train_seq, full_noised_signal_seq);
+    
+    noised_signal = zeros(1,Params.train_length+Params.LMS.L);
+    noised_signal(1,1:) = full_noised_signal_seq(1,Params.train_length:end);
+    pred_signal = LMS_inference(filter_coeffs, noised_signal);
+end
+
+function filter_coeffs = LMS_train(Params, known_train_seq, full_noised_signal_seq)
+    filter_coeffs = zeros(1, Params.LMS.L);
+    error_seq = zeros(1, Params.train_length);
+    
+    for iteration = 1:Params.train_length
+        signal_pred = sum(filter_coeffs .* ...
+            full_noised_signal_seq(1,iteration:iteration+Params.LMS.L-1));
+        error_seq(iteration) = known_train_seq(1,iteration)-signal_pred;
+        
+        filter_coeffs = filter_coeffs + ...
+            Params.LMS.alpha*error_seq(iteration)*...
+            full_noised_signal_seq(iteration:iteration+sim_params.L-1);
+    end
+end
+
+function pred_signal = LMS_inference(filter_coeffs, noised_signal)
+
+end
