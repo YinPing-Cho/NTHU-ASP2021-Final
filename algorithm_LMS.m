@@ -1,6 +1,6 @@
 function [overall_squared_error_seq, overall_pred_signal] = algorithm_LMS(Params, known_train_seq, full_noised_signal_seq)
     %{
-    General pipeline: 
+    I/O:
     -'Params' is a struct that includes most of the information you need.
         the most useful parameters are:
             -'.NumRepetition': how many paris of (1, train_seq+data_seq)
@@ -11,6 +11,13 @@ function [overall_squared_error_seq, overall_pred_signal] = algorithm_LMS(Params
         used in the training phase as the target signal.
     -'full_noised_signal': the (1, (train_L+data_L)*N) sequence that include 
         both the training sequence(s) and data sequence(s).
+    General pipeline:
+        -Initialize 'filter coefficient'
+    	-For each (train_seq+data_seq) sequence:
+            Train and update 'filter coefficient'
+            Use 'filter coefficient' to predict the data_seq part
+            record training error and predicted data_seq
+        -Return training error sequence and predicted data sequence
     %}
 
     overall_squared_error_seq = zeros(1,Params.NumRepetition*Params.train_length);
