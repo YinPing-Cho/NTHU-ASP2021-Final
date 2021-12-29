@@ -61,15 +61,17 @@ function [error_seq, filter_coeffs] = LMS_train(Params, filter_coeffs, known_tra
 end
 
 function pred_signal = LMS_inference(filter_coeffs, noised_signal)
-    input_signal_size = size(noised_signal);
-    signal_length = input_signal_size(2);
-    
-    filter_size = size(filter_coeffs);
-    filter_length = filter_size(2);
+    signal_length = get_length(noised_signal);
+    filter_length = get_length(filter_coeffs);
     
     pred_signal = zeros(1, signal_length-filter_length);
     for iteration = 1:(signal_length-filter_length)
         pred_signal(iteration) = sum(filter_coeffs .* ...
             noised_signal(1,iteration:iteration+filter_length-1));
     end
+end
+
+function length = get_length(seq)
+    seq_size = size(seq);
+    length = seq_size(end);
 end
