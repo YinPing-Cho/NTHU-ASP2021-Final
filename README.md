@@ -8,6 +8,7 @@ Final project repo for grad-level Adaptive Signal Processing course at National 
 - `shared_utils.m`: contains general utilities that can be called across the system. Such as MSELoss function, visualization functions, and custom autocorrelation calculation functions, etc.
 
 # Algorithms to be implemented:
-- DFE-RLS (2015)
+- RLS-DFE (2015)
 - NLMS-DFE (2008 good for time-varying)
-- 
+- VSLMS-DFE
+- LMS-DFE
