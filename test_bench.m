@@ -62,16 +62,21 @@ TestCase_Params.plot_bounds = [0, 2.0];
 %{
 Here is the main execution of the test.
 %}
+test_algos = ["LMS","RLS-DFE"];
 test_cases = ["Static","Q_Static","T_Varying"];
-for test_index = 1:3
-    TestCase_Params.Test = test_cases(test_index);
-    SNR_settings = DataMeasurements.(TestCase_Params.Test);
-    TestCase_Params.SNR_settings = SNR_settings;
-    SNR_settings = fieldnames(TestCase_Params.SNR_settings);
-    for snr_index = 1:numel(SNR_settings)
-        fprintf('\n%s SNR setting %d \n',TestCase_Params.Test,snr_index);
-        setting_name = cell2mat(SNR_settings(snr_index));
-        results = test_main(TestCase_Params, TestCase_Params.SNR_settings.(setting_name).SNR_seq);
+for algo_index = 1:numel(test_algos)
+    for test_index = 1:numel(test_cases)
+        TestCase_Params.Test = test_cases(test_index);
+        TestCase_Params.(TestCase_Params.Test).Algo = test_algos(algo_index);
+        SNR_settings = DataMeasurements.(TestCase_Params.Test);
+        TestCase_Params.SNR_settings = SNR_settings;
+        SNR_settings = fieldnames(TestCase_Params.SNR_settings);
+        for snr_index = 1:numel(SNR_settings)
+            fprintf('\n%s Algo:"%s" SNR setting %d \n',...
+                TestCase_Params.Test,TestCase_Params.(TestCase_Params.Test).Algo,snr_index);
+            setting_name = cell2mat(SNR_settings(snr_index));
+            results = test_main(TestCase_Params, TestCase_Params.SNR_settings.(setting_name).SNR_seq);
+        end
     end
 end
 
@@ -79,18 +84,28 @@ end
 function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCase_Params, SNR_seq)
     avg_prior_BER = 0;
     avg_post_BER = 0;
+    %avg_prior_BER_seq = 0;
+    %avg_post_BER_seq = 0;
     avg_squared_error_seq = zeros(1,TestCase_Params.(TestCase_Params.Test).NumRepetition*...
         TestCase_Params.(TestCase_Params.Test).train_length);
+    if ~strcmp(TestCase_Params.Test, 'Static')
+        avg_prior_BER_seq = zeros(1,TestCase_Params.(TestCase_Params.Test).NumRepetition);
+        avg_post_BER_seq = zeros(1,TestCase_Params.(TestCase_Params.Test).NumRepetition);
+    end
     for run = 1:TestCase_Params.Test_Runs
         switch TestCase_Params.Test
             case 'Static'
                 [prior_BER, post_BER, squared_error_seq] = static_test_case(TestCase_Params, SNR_seq);
             case 'Q_Static'
                 [prior_BER_seq, post_BER_seq, squared_error_seq] = q_static_test_case(TestCase_Params, SNR_seq);
+                avg_prior_BER_seq = cumulative_avg(avg_prior_BER_seq,prior_BER_seq,run);
+                avg_post_BER_seq = cumulative_avg(avg_post_BER_seq,post_BER_seq,run);
                 prior_BER = mean(prior_BER_seq);
                 post_BER = mean(post_BER_seq);
             case 'T_Varying'
                 [prior_BER_seq, post_BER_seq, squared_error_seq] = t_varying_test_case(TestCase_Params, SNR_seq);
+                avg_prior_BER_seq = cumulative_avg(avg_prior_BER_seq,prior_BER_seq,run);
+                avg_post_BER_seq = cumulative_avg(avg_post_BER_seq,post_BER_seq,run);
                 prior_BER = mean(prior_BER_seq);
                 post_BER = mean(post_BER_seq);
             otherwise
@@ -102,6 +117,23 @@ function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCa
         avg_squared_error_seq = cumulative_avg(avg_squared_error_seq,squared_error_seq,run);
     end
     
+    if ~strcmp(TestCase_Params.Test, 'Static')
+        utils_inputs.task = 'simple_plot';
+        utils_inputs.seq = avg_prior_BER_seq;
+        utils_inputs.bounds = [min(avg_prior_BER_seq) max(avg_prior_BER_seq)];
+        utils_inputs.title = sprintf('%s AVG SNR=%.2f; avged over %d runs prior BER plot',...
+            TestCase_Params.Test,mean(SNR_seq), TestCase_Params.Test_Runs);
+        shared_utils(utils_inputs);
+        pause(0.5);
+        utils_inputs.task = 'simple_plot';
+        utils_inputs.seq = avg_post_BER_seq;
+        utils_inputs.bounds = [min(avg_post_BER_seq) max(avg_post_BER_seq)];
+        utils_inputs.title = sprintf('%s AVG SNR=%.2f; avged over %d runspost BER plot',...
+            TestCase_Params.Test,mean(SNR_seq), TestCase_Params.Test_Runs);
+        shared_utils(utils_inputs);
+        pause(0.5);
+    end
+        
     utils_inputs.task = 'plot_squared_error_curve';
     utils_inputs.squared_error_seq = avg_squared_error_seq;
     utils_inputs.title = sprintf('%s Case avg squared-error over %d runs for %s algo; SNR=%.2f', ...
@@ -173,36 +205,10 @@ end
 
 function [prior_BER_seq, post_BER_seq, squared_error_seq] = q_static_test_case(TestCase_Params, SNR_seq)
     [prior_BER_seq, post_BER_seq, squared_error_seq] = non_static_test_case(TestCase_Params.Q_Static, SNR_seq);
-    
-    utils_inputs.task = 'simple_plot';
-    utils_inputs.seq = prior_BER_seq;
-    utils_inputs.bounds = [min(prior_BER_seq) max(prior_BER_seq)];
-    utils_inputs.title = sprintf('Quasi static AVG SNR=%.2f prior BER plot',mean(SNR_seq));
-    shared_utils(utils_inputs);
-    pause(0.2);
-    utils_inputs.task = 'simple_plot';
-    utils_inputs.seq = post_BER_seq;
-    utils_inputs.bounds = [min(prior_BER_seq) max(prior_BER_seq)];
-    utils_inputs.title = sprintf('Quasi static AVG SNR=%.2f post BER plot',mean(SNR_seq));
-    shared_utils(utils_inputs);
-    pause(0.2);
 end
 
 function [prior_BER_seq, post_BER_seq, squared_error_seq] = t_varying_test_case(TestCase_Params, SNR_seq)
     [prior_BER_seq, post_BER_seq, squared_error_seq] = non_static_test_case(TestCase_Params.T_Varying, SNR_seq);
-    
-    utils_inputs.task = 'simple_plot';
-    utils_inputs.seq = prior_BER_seq;
-    utils_inputs.bounds = [min(prior_BER_seq) max(prior_BER_seq)];
-    utils_inputs.title = sprintf('Time varying AVG SNR=%.2f prior BER plot',mean(SNR_seq));
-    shared_utils(utils_inputs);
-    pause(0.2);
-    utils_inputs.task = 'simple_plot';
-    utils_inputs.seq = post_BER_seq;
-    utils_inputs.bounds = [min(prior_BER_seq) max(prior_BER_seq)];
-    utils_inputs.title = sprintf('Time varying AVG SNR=%.2f post BER plot',mean(SNR_seq));
-    shared_utils(utils_inputs);
-    pause(0.2);
 end
 
 function [prior_BER_seq, post_BER_seq, squared_error_seq] = non_static_test_case(NonStaticTestCase_Params, SNR_seq)
