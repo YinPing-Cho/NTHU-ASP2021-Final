@@ -13,7 +13,7 @@ Here is for parameter definition for the Static test case.
 TestCase_Params.Static.NumRepetition = 1;
 TestCase_Params.Static.train_length = 1000;
 TestCase_Params.Static.data_length = 200000;
-TestCase_Params.Static.Algo = 'LMS';
+TestCase_Params.Static.Algo = 'RLS-DFE';
 TestCase_Params.Static.LMS.L = 20;
 TestCase_Params.Static.LMS.alpha = 0.01;
 % BELOW: RLS_DFE parameters
@@ -29,9 +29,14 @@ Here is for parameter definition for the Quasi-Stationary test case.
 TestCase_Params.Q_Static.NumRepetition = 200;
 TestCase_Params.Q_Static.train_length = 200;
 TestCase_Params.Q_Static.data_length = 1000;
-TestCase_Params.Q_Static.Algo = 'LMS';
+TestCase_Params.Q_Static.Algo = 'RLS-DFE';
 TestCase_Params.Q_Static.LMS.L = 20;
 TestCase_Params.Q_Static.LMS.alpha = 0.001;
+
+TestCase_Params.Q_Static.RLS_DFE.Lfff = 15;
+TestCase_Params.Q_Static.RLS_DFE.Lfbf = 10;
+TestCase_Params.Q_Static.RLS_DFE.lambda = 0.993; 
+TestCase_Params.Q_Static.RLS_DFE.delta = 1;
 
 %{
 Here is for parameter definition for the Time-Varying test case
@@ -39,9 +44,14 @@ Here is for parameter definition for the Time-Varying test case
 TestCase_Params.T_Varying.NumRepetition = 500;
 TestCase_Params.T_Varying.train_length = 50;
 TestCase_Params.T_Varying.data_length = 400;
-TestCase_Params.T_Varying.Algo = 'LMS';
+TestCase_Params.T_Varying.Algo = 'RLS-DFE';
 TestCase_Params.T_Varying.LMS.L = 20;
 TestCase_Params.T_Varying.LMS.alpha = 0.001;
+
+TestCase_Params.T_Varying.RLS_DFE.Lfff = 15;
+TestCase_Params.T_Varying.RLS_DFE.Lfbf = 10;
+TestCase_Params.T_Varying.RLS_DFE.lambda = 0.993; 
+TestCase_Params.T_Varying.RLS_DFE.delta = 1;
 
 %{
 Here is for test setup configuration.
@@ -145,7 +155,6 @@ function [prior_BER, post_BER, squared_error_seq] = static_test_case(TestCase_Pa
             [squared_error_seq, pred_signal] = ...
                 algorithm_LMS_DFE(TestCase_Params.Static,known_train_seq,full_noised_signal_seq);
         case 'RLS-DFE'
-            assert(false, 'Not implemented error.')
             [squared_error_seq, pred_signal] = ...
                 algorithm_RLS_DFE(TestCase_Params.Static,known_train_seq,full_noised_signal_seq);
         case 'NLMS-DFE'
@@ -253,7 +262,6 @@ function [prior_BER_seq, post_BER_seq, squared_error_seq] = non_static_test_case
             [squared_error_seq, pred_signal] = ...
                 algorithm_LMS_DFE(NonStaticTestCase_Params,known_train_seq,full_noised_signal_seq);
         case 'RLS-DFE'
-            assert(false, 'Not implemented error.')
             [squared_error_seq, pred_signal] = ...
                 algorithm_RLS_DFE(NonStaticTestCase_Params,known_train_seq,full_noised_signal_seq);
         case 'NLMS-DFE'
