@@ -26,17 +26,17 @@ DataParams.T_Varying.EachDataSeqLength = DataParams.T_Varying.EachFullSeqLength-
 %{
 Test data measurements
 %}
-[Static.Seq1.SNR,Static.Seq1.prior_BER] = measure_static_data(DataParams.Static, trainseq_static_1, data_static_1);
-[Static.Seq2.SNR,Static.Seq2.prior_BER] = measure_static_data(DataParams.Static, trainseq_static_2, data_static_2);
-DataMeasurements.Static = Static;
+[Static.Seq1.SNR_seq,Static.Seq1.prior_BER_seq] = measure_static_data(DataParams.Static, trainseq_static_1, data_static_1);
+[Static.Seq2.SNR_seq,Static.Seq2.prior_BER_seq] = measure_static_data(DataParams.Static, trainseq_static_2, data_static_2);
+DataMeasurements.('Static') = Static;
 
 [Q_Static.Seq1.SNR_seq,Q_Static.Seq1.prior_BER_seq] = measure_non_static_data(DataParams.Q_Static, trainseq_qstatic_1, data_qstatic_1, 'Q-static Seq 1');
 [Q_Static.Seq2.SNR_seq,Q_Static.Seq2.prior_BER_seq] = measure_non_static_data(DataParams.Q_Static, trainseq_qstatic_2, data_qstatic_2, 'Q-static Seq 2');
-DataMeasurements.Q_Static = Q_Static;
+DataMeasurements.('Q_Static') = Q_Static;
 
 [T_Varying.Seq1.SNR_seq,T_Varying.Seq1.prior_BER_seq] = measure_non_static_data(DataParams.T_Varying, trainseq_varying_1, data_varying_1, 'T-varying Seq 1');
 [T_Varying.Seq2.SNR_seq,T_Varying.Seq2.prior_BER_seq] = measure_non_static_data(DataParams.T_Varying, trainseq_varying_2, data_varying_2, 'T-varying Seq 2');
-DataMeasurements.T_Varying = T_Varying;
+DataMeasurements.('T_Varying') = T_Varying;
 
 save('Measurements.mat','DataMeasurements');
 
@@ -77,10 +77,12 @@ function [SNR_seq, prior_BER_seq] = measure_non_static_data(DataParams_NonStatic
     
     utils_inputs.task = 'simple_plot';
     utils_inputs.seq = SNR_seq;
+    utils_inputs.bounds = [];
     utils_inputs.title = sprintf('%s SNR plot',seq_name);
     shared_utils(utils_inputs);
     %pause();
     utils_inputs.seq = prior_BER_seq;
+    utils_inputs.bounds = [];
     utils_inputs.title = sprintf('%s prior-BER plot',seq_name);
     shared_utils(utils_inputs);
     %pause();

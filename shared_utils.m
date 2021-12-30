@@ -9,7 +9,7 @@ function results = shared_utils(Inputs)
         case 'plot_squared_error_curve'
             results = plot_squared_error_curve(Inputs.squared_error_seq, Inputs.title, Inputs.bounds);
         case 'simple_plot'
-            results = simple_plot(Inputs.seq, Inputs.title);
+            results = simple_plot(Inputs.seq, Inputs.title, Inputs.bounds);
         otherwise
             assert(false, 'Not implemented error.')
     end
@@ -46,12 +46,15 @@ function none = plot_squared_error_curve(squared_error_seq, plot_title, bounds)
     none = [];
 end
 
-function none = simple_plot(seq, plot_title)
+function none = simple_plot(seq, plot_title, bounds)
     figure(1)
     seq_size = size(seq);
     seq_length = seq_size(2);
     plot_time_axis = linspace(1,seq_length,seq_length);
     plot(plot_time_axis, moving_average(seq, 1));
+    if ~isempty(bounds)
+        ylim(bounds);
+    end
     title(plot_title);
     none = [];
 end

@@ -36,18 +36,19 @@ function [overall_squared_error_seq, overall_pred_signal] = algorithm_LMS(Params
         squared_error_seq = error_seq .^ 2;
         
         % Prepare data for decision-directed phase
-        noised_signal = zeros(1,Params.train_length+Params.LMS.L);
+        noised_signal = zeros(1,Params.data_length+Params.LMS.L);
+
         noised_signal(1,1:Params.data_length) = ...
             full_noised_signal_seq(1,start_index+Params.train_length:-1+start_index+Params.train_length+Params.data_length);
-        noised_signal(1,start_index+Params.data_length:-1+start_index+Params.data_length+Params.LMS.L) = ...
+        noised_signal(1,Params.data_length:-1+Params.data_length+Params.LMS.L) = ...
             full_noised_signal_seq(1,start_index:-1+start_index+Params.LMS.L);
 
         % Prediction/inference/decision-directed phase
         pred_signal = LMS_inference(filter_coeffs, noised_signal);
-        
+
         % Record results
-        overall_squared_error_seq((repetition-1)*Params.train_length+1:repetition*Params.train_length)=squared_error_seq;
-        overall_pred_signal((repetition-1)*Params.data_length+1:repetition*Params.data_length)=pred_signal;
+        overall_squared_error_seq(1,(repetition-1)*Params.train_length+1:repetition*Params.train_length)=squared_error_seq;
+        overall_pred_signal(1,1+(repetition-1)*Params.data_length:repetition*Params.data_length)=pred_signal;
         
         start_index = start_index + Params.train_length + Params.data_length;
     end
