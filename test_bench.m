@@ -9,6 +9,12 @@ TestCase_Params.Static.data_length = 200000;
 TestCase_Params.Static.Algo = 'LMS';
 TestCase_Params.Static.LMS.L = 20;
 TestCase_Params.Static.LMS.alpha = 0.01;
+% BELOW: RLS_DFE parameters
+TestCase_Params.Static.RLS_DFE.Lfff = 20;
+TestCase_Params.Static.RLS_DFE.Lfbf = 20;
+TestCase_Params.Static.RLS_DFE.lambda = 0.999; 
+TestCase_Params.Static.RLS_DFE.delta = 1;
+% ABOVE: RLS_DFE parameters
 
 %{
 Here is for parameter definition for the Quasi-Stationary test case.
