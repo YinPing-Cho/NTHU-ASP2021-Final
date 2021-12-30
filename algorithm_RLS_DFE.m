@@ -41,7 +41,7 @@ Rbi         = delta * eye(Pa.RLS_DFE.Lfbf); % R inverse (fbf)
 % reserve space for outputs
 squared_e   = zeros(1, Pa.NumRepetition * Pa.train_length);
 pred_data   = zeros(1, Pa.NumRepetition * Pa.data_length);
-pred_trian  = zeros(1, Pa.NumRepetition * Pa.train_length);
+pred_train  = zeros(1, Pa.NumRepetition * Pa.train_length);
 
 % adaptive filter
 for ind = 1:total_len
@@ -69,7 +69,7 @@ for ind = 1:total_len
     train_ind = rem(ind, unit_length);
     if and(train_ind <= Pa.train_length, train_ind ~= 0) % train mode
         squared_e(squared_e_ind) = e(ind) ^ 2; 
-        pred_trian(squared_e_ind) = y(ind);
+        pred_train(squared_e_ind) = y(ind);
         squared_e_ind = squared_e_ind + 1;
     else                                        % decision-directed mode
         pred_data(pred_ind) = y(ind);
@@ -83,5 +83,5 @@ if nargout == 2
 elseif nargout == 3
     varargout{1} = squared_e;
     varargout{2} = pred_data;
-    varargout{3} = pred_trian;
+    varargout{3} = pred_train;
 end
