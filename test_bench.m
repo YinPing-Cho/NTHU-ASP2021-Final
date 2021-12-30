@@ -46,20 +46,25 @@ TestCase_Params.T_Varying.LMS.alpha = 0.001;
 %{
 Here is for test setup configuration.
 %}
-TestCase_Params.Test = 'T_Varying';
 TestCase_Params.Test_Runs = 10;
-SNR_settings = DataMeasurements.(TestCase_Params.Test);
-TestCase_Params.SNR_settings = SNR_settings;
-TestCase_Params.plot_bounds = [0, 1.6];
+TestCase_Params.plot_bounds = [0, 2.0];
 
 %{
 Here is the main execution of the test.
 %}
-SNR_settings = fieldnames(TestCase_Params.SNR_settings);
-for snr_index = 1:numel(SNR_settings)
-    setting_name = cell2mat(SNR_settings(snr_index));
-    results = test_main(TestCase_Params, TestCase_Params.SNR_settings.(setting_name).SNR_seq);
+test_cases = ["Static","Q_Static","T_Varying"];
+for test_index = 1:3
+    TestCase_Params.Test = test_cases(test_index);
+    SNR_settings = DataMeasurements.(TestCase_Params.Test);
+    TestCase_Params.SNR_settings = SNR_settings;
+    SNR_settings = fieldnames(TestCase_Params.SNR_settings);
+    for snr_index = 1:numel(SNR_settings)
+        fprintf('\n%s SNR setting %d \n',TestCase_Params.Test,snr_index);
+        setting_name = cell2mat(SNR_settings(snr_index));
+        results = test_main(TestCase_Params, TestCase_Params.SNR_settings.(setting_name).SNR_seq);
+    end
 end
+
 
 function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCase_Params, SNR_seq)
     avg_prior_BER = 0;
@@ -93,6 +98,7 @@ function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCa
         TestCase_Params.Test, TestCase_Params.Test_Runs, TestCase_Params.Static.Algo, mean(SNR_seq));
     utils_inputs.bounds = TestCase_Params.plot_bounds;
     shared_utils(utils_inputs);
+    pause(1);
     
     fprintf('%s test case; %s; SNR=%.2f;\n',...
         TestCase_Params.Test,TestCase_Params.Static.Algo, mean(SNR_seq));

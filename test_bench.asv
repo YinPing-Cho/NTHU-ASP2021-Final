@@ -16,6 +16,12 @@ TestCase_Params.Static.data_length = 200000;
 TestCase_Params.Static.Algo = 'LMS';
 TestCase_Params.Static.LMS.L = 20;
 TestCase_Params.Static.LMS.alpha = 0.01;
+% BELOW: RLS_DFE parameters
+TestCase_Params.Static.RLS_DFE.Lfff = 20;
+TestCase_Params.Static.RLS_DFE.Lfbf = 20;
+TestCase_Params.Static.RLS_DFE.lambda = 0.999; 
+TestCase_Params.Static.RLS_DFE.delta = 1;
+% ABOVE: RLS_DFE parameters
 
 %{
 Here is for parameter definition for the Quasi-Stationary test case.
@@ -33,24 +39,31 @@ Here is for parameter definition for the Time-Varying test case
 TestCase_Params.T_Varying.NumRepetition = 500;
 TestCase_Params.T_Varying.train_length = 50;
 TestCase_Params.T_Varying.data_length = 400;
+TestCase_Params.T_Varying.Algo = 'LMS';
+TestCase_Params.T_Varying.LMS.L = 20;
+TestCase_Params.T_Varying.LMS.alpha = 0.001;
 
 %{
 Here is for test setup configuration.
 %}
-TestCase_Params.Test = 'Q_Static';
 TestCase_Params.Test_Runs = 10;
 SNR_settings = DataMeasurements.(TestCase_Params.Test);
 TestCase_Params.SNR_settings = SNR_settings;
-TestCase_Params.plot_bounds = [0, 1.6];
+TestCase_Params.plot_bounds = [0, 2.0];
 
 %{
 Here is the main execution of the test.
 %}
-SNR_settings = fieldnames(TestCase_Params.SNR_settings);
-for snr_index = 1:numel(SNR_settings)
-    setting_name = cell2mat(SNR_settings(snr_index));
-    results = test_main(TestCase_Params, TestCase_Params.SNR_settings.(setting_name).SNR_seq);
+test_cases = s['Static' 'Q_Static' 'T_Varying'];
+for test_index = 1:3
+    SNR_settings = fieldnames(TestCase_Params.SNR_settings);
+    TestCase_Params.Test = test_cases(test_index);
+    for snr_index = 1:numel(SNR_settings)
+        setting_name = cell2mat(SNR_settings(snr_index));
+        results = test_main(TestCase_Params, TestCase_Params.SNR_settings.(setting_name).SNR_seq);
+    end
 end
+
 
 function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCase_Params, SNR_seq)
     avg_prior_BER = 0;
@@ -84,6 +97,7 @@ function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCa
         TestCase_Params.Test, TestCase_Params.Test_Runs, TestCase_Params.Static.Algo, mean(SNR_seq));
     utils_inputs.bounds = TestCase_Params.plot_bounds;
     shared_utils(utils_inputs);
+    pause(1);
     
     fprintf('%s test case; %s; SNR=%.2f;\n',...
         TestCase_Params.Test,TestCase_Params.Static.Algo, mean(SNR_seq));
@@ -138,7 +152,7 @@ function [prior_BER, post_BER, squared_error_seq] = static_test_case(TestCase_Pa
             [squared_error_seq, pred_signal] = ...
                 algorithms_NLMS_DFE(TestCase_Params.Static,known_train_seq,full_noised_signal_seq);
         otherwise
-        assert(false, 'Not implemented error.')
+            assert(false, 'Not implemented error.')
     end
     
     utils_inputs.task = 'calc_BER';
