@@ -24,11 +24,12 @@ Final project repo for grad-level Adaptive Signal Processing course at National 
 
 # 分工:
 - 引平：共用code架構+實作LMS-DFE測試。
-- [ ] `test_bench.m`
+- [x] `test_bench.m`
 - [ ] `main.m`
-- [ ] `shared_utils.m`
+- [x] `shared_utils.m`
+- [x] `algorithm_LMS.m`
 - [ ] `algorithm_LMS_DFE.m`
 - 昊平、宣妤：RLS-DFE
-- [ ] `algorithm_RLS_DFE.m`
+- [x] `algorithm_RLS_DFE.m`
 - 若盈：NLMS-DFE
 - [ ] `algorithms_NLMS_DFE.m`
