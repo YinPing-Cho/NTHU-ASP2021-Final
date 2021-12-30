@@ -84,14 +84,13 @@ end
 function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCase_Params, SNR_seq)
     avg_prior_BER = 0;
     avg_post_BER = 0;
-    %avg_prior_BER_seq = 0;
-    %avg_post_BER_seq = 0;
     avg_squared_error_seq = zeros(1,TestCase_Params.(TestCase_Params.Test).NumRepetition*...
         TestCase_Params.(TestCase_Params.Test).train_length);
     if ~strcmp(TestCase_Params.Test, 'Static')
         avg_prior_BER_seq = zeros(1,TestCase_Params.(TestCase_Params.Test).NumRepetition);
         avg_post_BER_seq = zeros(1,TestCase_Params.(TestCase_Params.Test).NumRepetition);
     end
+    
     for run = 1:TestCase_Params.Test_Runs
         switch TestCase_Params.Test
             case 'Static'
