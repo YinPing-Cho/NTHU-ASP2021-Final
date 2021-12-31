@@ -1,8 +1,0 @@
-function measurements = l
-
-mfile_name          = mfilename('fullpath');
-[pathstr,name,ext]  = fileparts(mfile_name);
-cd(pathstr);
-fileparts(matlab.desktop.editor.getActiveFilename)
-
-load Measurements.mat

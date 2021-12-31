@@ -14,14 +14,6 @@ TestCase_Params.Static.NumRepetition = 1;
 TestCase_Params.Static.train_length = 1000;
 TestCase_Params.Static.data_length = 200000;
 TestCase_Params.Static.Algo = 'RLS-DFE';
-TestCase_Params.Static.LMS.L = 20;
-TestCase_Params.Static.LMS.alpha = 0.01;
-% BELOW: RLS_DFE parameters
-TestCase_Params.Static.RLS_DFE.Lfff = 20;
-TestCase_Params.Static.RLS_DFE.Lfbf = 20;
-TestCase_Params.Static.RLS_DFE.lambda = 0.999; 
-TestCase_Params.Static.RLS_DFE.delta = 1;
-% ABOVE: RLS_DFE parameters
 
 %{
 Here is for parameter definition for the Quasi-Stationary test case.
@@ -30,13 +22,6 @@ TestCase_Params.Q_Static.NumRepetition = 200;
 TestCase_Params.Q_Static.train_length = 200;
 TestCase_Params.Q_Static.data_length = 1000;
 TestCase_Params.Q_Static.Algo = 'RLS-DFE';
-TestCase_Params.Q_Static.LMS.L = 20;
-TestCase_Params.Q_Static.LMS.alpha = 0.01;
-
-TestCase_Params.Q_Static.RLS_DFE.Lfff = 15;
-TestCase_Params.Q_Static.RLS_DFE.Lfbf = 10;
-TestCase_Params.Q_Static.RLS_DFE.lambda = 0.993; 
-TestCase_Params.Q_Static.RLS_DFE.delta = 1;
 
 %{
 Here is for parameter definition for the Time-Varying test case
@@ -45,17 +30,11 @@ TestCase_Params.T_Varying.NumRepetition = 500;
 TestCase_Params.T_Varying.train_length = 50;
 TestCase_Params.T_Varying.data_length = 400;
 TestCase_Params.T_Varying.Algo = 'RLS-DFE';
-TestCase_Params.T_Varying.LMS.L = 20;
-TestCase_Params.T_Varying.LMS.alpha = 0.01;
-
-TestCase_Params.T_Varying.RLS_DFE.Lfff = 15;
-TestCase_Params.T_Varying.RLS_DFE.Lfbf = 10;
-TestCase_Params.T_Varying.RLS_DFE.lambda = 0.993; 
-TestCase_Params.T_Varying.RLS_DFE.delta = 1;
 
 %{
 Here is for test setup configuration.
 %}
+TestCase_Params = Init_AdaptiveAlgoParams(TestCase_Params);
 TestCase_Params.Test_Runs = 10;
 TestCase_Params.plot_bounds = [0, 3.0];
 
@@ -67,6 +46,14 @@ TestResults = MAIN(TestCase_Params, DataMeasurements);
 %{###############################
 %# BELOW ARE THE FUNCTIONS ######
 %}###############################
+
+function TestCase_Params = Init_AdaptiveAlgoParams(TestCase_Params)
+    TestCase_Params = PARAMS_LMS(TestCase_Params);
+    TestCase_Params = PARAMS_LMS_DFE(TestCase_Params);
+    TestCase_Params = PARAMS_NLMS_DFE(TestCase_Params);
+    TestCase_Params = PARAMS_RLS_DFE(TestCase_Params);
+end
+
 function TestResults = MAIN(TestCase_Params, DataMeasurements)
     TestResults = full_simulation_main(TestCase_Params, DataMeasurements);
     display_test_results(TestResults);
