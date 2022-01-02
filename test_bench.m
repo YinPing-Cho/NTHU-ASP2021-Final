@@ -5,7 +5,7 @@ rng(seed);
 
 clf;
 display_figs = false;
-test_config_suffix = 'v120_defaults';
+test_config_suffix = '_v120_defaults';
 test_results_path = [pwd sprintf('/TestBenchResults/test_bench_results%s.csv',test_config_suffix)];
 
 %{
@@ -64,7 +64,27 @@ end
 function TestResults = MAIN(TestCase_Params, DataMeasurements, test_results_path, display_figs)
     TestResults = full_simulation_main(TestCase_Params, DataMeasurements, display_figs);
     display_test_results(TestResults);
-    writetable(struct2table(TestResults), test_results_path);
+    write_results_to_csv(TestResults, test_results_path);
+end
+
+function result_table = write_results_to_csv(TestResults, test_results_path)
+    configs = fieldnames(TestResults);
+    num_configs = numel(configs);
+    
+    ConfigDescription = cell(num_configs,1);
+    AVG_Prior_BER = zeros(num_configs,1);
+    AVG_Post_BER = zeros(num_configs,1);
+    
+    for config_index = 1:num_configs
+        config_string = cell2mat(configs(config_index));
+
+        ConfigDescription{config_index} = TestResults.(config_string).ConfigContents;
+        AVG_Prior_BER(config_index) = TestResults.(config_string).avg_prior_BER;
+        AVG_Post_BER(config_index) = TestResults.(config_string).avg_post_BER;
+    end
+    
+    result_table = table(ConfigDescription,AVG_Prior_BER,AVG_Post_BER);
+    writetable(result_table, test_results_path);
 end
 
 function TestResults = full_simulation_main(TestCase_Params, DataMeasurements, display_figs)
