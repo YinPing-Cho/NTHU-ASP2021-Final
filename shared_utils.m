@@ -36,18 +36,16 @@ function BER = calc_BER(pred_seq, signal_seq)
 end
 
 function none = plot_squared_error_curve(squared_error_seq, plot_title, bounds)
-    figure(1)
     seq_size = size(squared_error_seq);
     seq_length = seq_size(2);
     plot_time_axis = linspace(1,seq_length,seq_length);
     plot(plot_time_axis, moving_average(squared_error_seq, 1));
     ylim(bounds);
-    title(plot_title);
+    title(plot_title, 'Interpreter', 'none');
     none = [];
 end
 
 function none = simple_plot(seq, plot_title, bounds)
-    figure(1)
     seq_size = size(seq);
     seq_length = seq_size(2);
     plot_time_axis = linspace(1,seq_length,seq_length);
@@ -55,7 +53,7 @@ function none = simple_plot(seq, plot_title, bounds)
     if ~isempty(bounds)
         ylim(bounds);
     end
-    title(plot_title);
+    title(plot_title, 'Interpreter', 'none');
     none = [];
 end
 

@@ -1,5 +1,12 @@
+clear;
+
 seed = 0;
 rng(seed);
+
+clf;
+display_figs = false;
+test_config_suffix = 'v120_defaults';
+test_results_path = [pwd sprintf('/TestBenchResults/test_bench_results%s.csv',test_config_suffix)];
 
 %{
 Load test data measurements
@@ -41,7 +48,7 @@ TestCase_Params.plot_bounds = [0, 3.0];
 %{
 Here is the main execution of the test.
 %}
-TestResults = MAIN(TestCase_Params, DataMeasurements);
+TestResults = MAIN(TestCase_Params, DataMeasurements, test_results_path, display_figs);
 
 %{###############################
 %# BELOW ARE THE FUNCTIONS ######
@@ -54,28 +61,34 @@ function TestCase_Params = Init_AdaptiveAlgoParams(TestCase_Params)
     TestCase_Params = PARAMS_RLS_DFE(TestCase_Params);
 end
 
-function TestResults = MAIN(TestCase_Params, DataMeasurements)
-    TestResults = full_simulation_main(TestCase_Params, DataMeasurements);
+function TestResults = MAIN(TestCase_Params, DataMeasurements, test_results_path, display_figs)
+    TestResults = full_simulation_main(TestCase_Params, DataMeasurements, display_figs);
     display_test_results(TestResults);
+    writetable(struct2table(TestResults), test_results_path);
 end
 
-function TestResults = full_simulation_main(TestCase_Params, DataMeasurements)
+function TestResults = full_simulation_main(TestCase_Params, DataMeasurements, display_figs)
     TestResults = struct();
-    test_algos = ["LMS","RLS-DFE"];
+    test_algos = ["LMS","LMS-DFE","NLMS-DFE","RLS-DFE"];
     test_cases = ["Static","Q_Static","T_Varying"];
     run_count = 0;
+    % Iterate algorithms
     for algo_index = 1:numel(test_algos)
+        % Iterate test cases
         for test_index = 1:numel(test_cases)
             TestCase_Params.Test = test_cases(test_index);
             TestCase_Params.(TestCase_Params.Test).Algo = test_algos(algo_index);
             SNR_settings = DataMeasurements.(TestCase_Params.Test);
             TestCase_Params.SNR_settings = SNR_settings;
             SNR_settings = fieldnames(TestCase_Params.SNR_settings);
+            % Iterate SNR settings
             for snr_index = 1:numel(SNR_settings)
+                clf;
                 fprintf('\n%s Algo:"%s" SNR setting %d \n',...
                     TestCase_Params.Test,TestCase_Params.(TestCase_Params.Test).Algo,snr_index);
                 setting_name = cell2mat(SNR_settings(snr_index));
-                [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCase_Params, TestCase_Params.SNR_settings.(setting_name).SNR_seq);
+                [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = ...
+                    test_main(TestCase_Params, TestCase_Params.SNR_settings.(setting_name).SNR_seq, snr_index, display_figs);
 
                 TestConfig = sprintf('Config%d',run_count);
                 run_count = run_count + 1;
@@ -104,7 +117,7 @@ function display_test_results(TestResults)
     end
 end
 
-function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCase_Params, SNR_seq)
+function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCase_Params, SNR_seq, snr_index, display_figs)
     avg_prior_BER = 0;
     avg_post_BER = 0;
     avg_squared_error_seq = zeros(1,TestCase_Params.(TestCase_Params.Test).NumRepetition*...
@@ -139,21 +152,31 @@ function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCa
         avg_squared_error_seq = cumulative_avg(avg_squared_error_seq,squared_error_seq,run);
     end
     
+    if ~display_figs
+        p_fig = figure('visible','off');
+    else
+        p_fig = figure('visible','on');
+    end
+    
     if ~strcmp(TestCase_Params.Test, 'Static')
+        
+        tiledlayout(3,1);
+        
+        nexttile;
         utils_inputs.task = 'simple_plot';
         utils_inputs.seq = avg_prior_BER_seq;
         utils_inputs.bounds = [min(avg_prior_BER_seq) max(avg_prior_BER_seq)];
-        utils_inputs.title = sprintf('%s AVG SNR=%.2f; avged over %d runs prior BER plot',...
-            TestCase_Params.Test,mean(SNR_seq), TestCase_Params.Test_Runs);
+        utils_inputs.title = sprintf('%s AVG SNR=%.2f; avged over %d runs for %s algo; prior BER plot',...
+            TestCase_Params.Test,mean(SNR_seq), TestCase_Params.Test_Runs, TestCase_Params.Static.Algo);
         shared_utils(utils_inputs);
-        pause(2.0);
+        nexttile;
         utils_inputs.task = 'simple_plot';
         utils_inputs.seq = avg_post_BER_seq;
-        utils_inputs.bounds = [min(avg_post_BER_seq) max(avg_post_BER_seq)];
-        utils_inputs.title = sprintf('%s AVG SNR=%.2f; avged over %d runspost BER plot',...
-            TestCase_Params.Test,mean(SNR_seq), TestCase_Params.Test_Runs);
+        utils_inputs.bounds = [min(avg_prior_BER_seq) max(avg_prior_BER_seq)];
+        utils_inputs.title = sprintf('%s AVG SNR=%.2f; avged over %d runs for %s algo; post BER plot',...
+            TestCase_Params.Test,mean(SNR_seq), TestCase_Params.Test_Runs, TestCase_Params.Static.Algo);
         shared_utils(utils_inputs);
-        pause(2.0);
+        nexttile;
     end
         
     utils_inputs.task = 'plot_squared_error_curve';
@@ -162,7 +185,12 @@ function [avg_prior_BER, avg_post_BER, avg_squared_error_seq] = test_main(TestCa
         TestCase_Params.Test, TestCase_Params.Test_Runs, TestCase_Params.Static.Algo, mean(SNR_seq));
     utils_inputs.bounds = TestCase_Params.plot_bounds;
     shared_utils(utils_inputs);
-    pause(1);
+    
+    set(p_fig,'WindowState','maximized');
+    
+    saveas(p_fig,[pwd sprintf('/TestFigs/%s_%s_snr%d.jpg',...
+        TestCase_Params.Test,TestCase_Params.(TestCase_Params.Test).Algo, snr_index)]);
+    %pause(0.5);
     
     fprintf('%s test case; %s; SNR=%.2f;\n',...
         TestCase_Params.Test,TestCase_Params.Static.Algo, mean(SNR_seq));
@@ -205,16 +233,14 @@ function [prior_BER, post_BER, squared_error_seq] = static_test_case(TestCase_Pa
             [squared_error_seq, pred_signal] = ...
                 algorithm_LMS(TestCase_Params.Static,known_train_seq,full_noised_signal_seq);
         case 'LMS-DFE'
-            assert(false, 'Not implemented error.')
             [squared_error_seq, pred_signal] = ...
                 algorithm_LMS_DFE(TestCase_Params.Static,known_train_seq,full_noised_signal_seq);
         case 'RLS-DFE'
             [squared_error_seq, pred_signal] = ...
                 algorithm_RLS_DFE(TestCase_Params.Static,known_train_seq,full_noised_signal_seq);
         case 'NLMS-DFE'
-            assert(false, 'Not implemented error.')
             [squared_error_seq, pred_signal] = ...
-                algorithms_NLMS_DFE(TestCase_Params.Static,known_train_seq,full_noised_signal_seq);
+                algorithm_NLMS_DFE(TestCase_Params.Static,known_train_seq,full_noised_signal_seq);
         otherwise
             assert(false, 'Not implemented error.')
     end
@@ -286,16 +312,14 @@ function [prior_BER_seq, post_BER_seq, squared_error_seq] = non_static_test_case
             [squared_error_seq, pred_signal] = ...
                 algorithm_LMS(NonStaticTestCase_Params,known_train_seq,full_noised_signal_seq);
         case 'LMS-DFE'
-            assert(false, 'Not implemented error.')
             [squared_error_seq, pred_signal] = ...
                 algorithm_LMS_DFE(NonStaticTestCase_Params,known_train_seq,full_noised_signal_seq);
         case 'RLS-DFE'
             [squared_error_seq, pred_signal] = ...
                 algorithm_RLS_DFE(NonStaticTestCase_Params,known_train_seq,full_noised_signal_seq);
         case 'NLMS-DFE'
-            assert(false, 'Not implemented error.')
             [squared_error_seq, pred_signal] = ...
-                algorithms_NLMS_DFE(NonStaticTestCase_Params,known_train_seq,full_noised_signal_seq);
+                algorithm_NLMS_DFE(NonStaticTestCase_Params,known_train_seq,full_noised_signal_seq);
         otherwise
         assert(false, 'Not implemented error.')
     end
