@@ -2,6 +2,7 @@
 Final project repo for grad-level Adaptive Signal Processing course at National Tsinghua University, Taiwan.
 
 # Update 2022/01/02
+- 請更新至 v1.2.0。
 - 已可`test_bench.m`完整進行 LMS, LMS-DFE, NLMS-DFE, RLS-DFE 測試，輸出結果請見`TestFigs`和`TestBenchResults`。
 - `main.m` 可讀取課程期末的測資、以指定的演算法濾波、並把結果按照規定輸出，error-curves輸出在`MainFigs`。
 
