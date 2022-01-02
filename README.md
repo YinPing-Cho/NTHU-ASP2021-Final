@@ -1,7 +1,11 @@
 # NTHU-ASP2021-Final
 Final project repo for grad-level Adaptive Signal Processing course at National Tsinghua University, Taiwan.
 
-# Update 12/31
+# Update 2022/01/02
+- 已可`test_bench.m`完整進行 LMS, LMS-DFE, NLMS-DFE, RLS-DFE 測試，輸出結果請見`TestFigs`和`TestBenchResults`。
+- `main.m` 可讀取課程期末的測資、以指定的演算法濾波、並把結果按照規定輸出，error-curves輸出在`MainFigs`。
+
+# Update 2021/12/31
 - 請使用 v1.1.0 來整合、測試不同的演算法，避免不同演算法測試編輯參數時的衝突。
 - v1.1.0 將不同演算法的參數維持在獨立的 `PARAMS_*.m` 檔案裏面，請將自己的演算法的參數儲存在當中、實驗不同參數時只需編輯 `PARAMS_*.m` 檔案。
 
