@@ -42,7 +42,7 @@ TestCase_Params.T_Varying.Algo = 'RLS-DFE';
 Here is for test setup configuration.
 %}
 TestCase_Params = Init_AdaptiveAlgoParams(TestCase_Params);
-TestCase_Params.Test_Runs = 10;
+TestCase_Params.Test_Runs = 50;
 TestCase_Params.plot_bounds = [0, 3.0];
 
 %{

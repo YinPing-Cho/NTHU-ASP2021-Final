@@ -8,6 +8,6 @@ function Params = PARAMS_LMS(Params)
     Params.Q_Static.LMS.alpha = 0.01;
     
     % For T_Varying case
-    Params.T_Varying.LMS.L = 10;
+    Params.T_Varying.LMS.L = 15;
     Params.T_Varying.LMS.alpha = 0.01;
 end
