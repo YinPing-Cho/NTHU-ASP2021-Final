@@ -89,7 +89,7 @@ end
 
 function TestResults = full_simulation_main(TestCase_Params, DataMeasurements, display_figs)
     TestResults = struct();
-    test_algos = ["LMS","LMS-DFE","NLMS-DFE","RLS-DFE"];
+    test_algos = ["RLS-DFE"];%"LMS","LMS-DFE","NLMS-DFE",
     test_cases = ["Static","Q_Static","T_Varying"];
     run_count = 0;
     % Iterate algorithms

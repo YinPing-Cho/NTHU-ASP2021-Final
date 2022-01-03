@@ -1,0 +1,8 @@
+This week:
+
+1. Experiments with different parameter configs: for RLS-DFE "test_algos" and "test_cases" at "PARAMS_RLS_DFE.m"
+
+2. Write report:
+	- Design experiments - SY RY
+		- Collect figures
+		- Formulate tables
