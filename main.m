@@ -72,6 +72,8 @@ Algo = AlgoParams.Static.Algo;
     AlgoParams, trainseq_static_1, data_static_1, DataProperty, Algo);
 [squared_error_seq_static_2, ans_static_2] = adaptive_filtering(...
     AlgoParams, trainseq_static_2, data_static_2, DataProperty, Algo);
+assert_all_pos_neg_one(ans_static_1);
+assert_all_pos_neg_one(ans_static_2);
 save('ans_static.mat','ans_static_1','ans_static_2');
 
 % Q_Static
@@ -81,6 +83,8 @@ Algo = AlgoParams.Q_Static.Algo;
     AlgoParams, trainseq_qstatic_1, data_qstatic_1, DataProperty, Algo);
 [squared_error_seq_qstatic_2, ans_qstatic_2] = adaptive_filtering(...
     AlgoParams, trainseq_qstatic_2, data_qstatic_2, DataProperty, Algo);
+assert_all_pos_neg_one(ans_qstatic_1);
+assert_all_pos_neg_one(ans_qstatic_2);
 save('ans_qstatic.mat','ans_qstatic_1','ans_qstatic_2');
 
 % T_Varying
@@ -90,6 +94,8 @@ Algo = AlgoParams.T_Varying.Algo;
     AlgoParams, trainseq_varying_1, data_varying_1, DataProperty, Algo);
 [squared_error_seq_varying_2, ans_varying_2] = adaptive_filtering(...
     AlgoParams, trainseq_varying_2, data_varying_2, DataProperty, Algo);
+assert_all_pos_neg_one(ans_varying_1);
+assert_all_pos_neg_one(ans_varying_2);
 save('ans_varying.mat','ans_varying_1','ans_varying_2');
 
 %{
@@ -135,6 +141,10 @@ saveas(gcf,[pwd '/MainFigs/Results.jpg']);
 %{###############################
 %# BELOW ARE THE FUNCTIONS ######
 %}###############################
+function assert_all_pos_neg_one(seq)
+    assert(all((seq==1) | (seq==-1)));
+end
+
 
 function bounds = get_bounds(seq1, seq2)
     bounds = [min(cat(2,seq1,seq2)) max(cat(2,seq1,seq2))];

@@ -77,6 +77,8 @@ for ind = 1:total_len
     end
 end
 
+pred_data = sign(pred_data);
+
 if nargout == 2 
     varargout{1} = squared_e;
     varargout{2} = pred_data;

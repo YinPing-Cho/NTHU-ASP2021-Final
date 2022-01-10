@@ -52,6 +52,8 @@ function [overall_squared_error_seq, overall_pred_signal] = algorithm_LMS(Params
         
         start_index = start_index + Params.train_length + Params.data_length;
     end
+    
+    overall_pred_signal = sign(overall_pred_signal);
 end
 
 function [error_seq, filter_coeffs] = LMS_train(Params, filter_coeffs, known_train_seq, full_noised_signal_seq)

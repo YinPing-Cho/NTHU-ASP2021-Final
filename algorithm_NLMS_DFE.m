@@ -33,6 +33,8 @@ function [overall_squared_error_seq, overall_pred_signal] = algorithm_NLMS_DFE(P
         
         start_index = start_index + Params.train_length + Params.data_length;
     end
+    
+    overall_pred_signal = sign(overall_pred_signal);
 end
 
 function [error_seq, ff_filter_coeffs, fb_filter_coeffs] = NLMS_DFE_train(Params, ff_filter_coeffs, fb_filter_coeffs, known_train_seq, full_noised_signal_seq)
