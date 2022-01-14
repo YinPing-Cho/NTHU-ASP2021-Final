@@ -42,5 +42,5 @@ Final project repo for grad-level Adaptive Signal Processing course at National 
 - 昊平：RLS-DFE
 - [x] `algorithm_RLS_DFE.m`
 - 宣妤、若盈：
-- [ ] RLS-DFE 最佳參數尋找
-- [ ] 報告實驗設計與結果收集
+- [x] RLS-DFE 最佳參數尋找
+- [x] 報告實驗設計與結果收集
